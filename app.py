@@ -1,68 +1,44 @@
 import streamlit as st
 from groq import Groq
 
-# =========================
-# إعداد الصفحة
-# =========================
-st.set_page_config(
-    page_title="enk8du AI",
-    page_icon="🤖",
-    layout="centered"
+# -----------------------------
+# API
+# -----------------------------
+client = Groq(
+    api_key=st.secrets["GROQ_API_KEY"]
 )
 
-# =========================
-# جلب المفاتيح من Secrets
-# =========================
-api_key = st.secrets["GROQ_API_KEY"]
-app_password = st.secrets["APP_PASSWORD"]
+# -----------------------------
+# PASSWORD
+# -----------------------------
+APP_PASSWORD = st.secrets["APP_PASSWORD"]
 
-# =========================
-# حماية بكلمة مرور
-# =========================
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
-
-    st.title("🔒 تسجيل الدخول")
-
-    password = st.text_input(
-        "ادخل كلمة المرور",
-        type="password"
-    )
-
-    if st.button("دخول"):
-        if password == app_password:
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("كلمة المرور خطأ")
-
-    st.stop()
-
-# =========================
-# تشغيل Groq
-# =========================
-client = Groq(api_key=api_key)
-
-# =========================
-# واجهة التطبيق
-# =========================
 st.title("enk8du AI")
 
+password = st.text_input("ادخل الباسورد", type="password")
+
+if password != APP_PASSWORD:
+    st.stop()
+
+# -----------------------------
+# CHAT HISTORY
+# -----------------------------
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# عرض الرسائل
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+# عرض الرسائل القديمة
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# إدخال المستخدم
+# -----------------------------
+# USER INPUT
+# -----------------------------
 prompt = st.chat_input("اكتب رسالتك...")
 
 if prompt:
 
+    # عرض رسالة المستخدم
     st.session_state.messages.append({
         "role": "user",
         "content": prompt
@@ -71,9 +47,9 @@ if prompt:
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # رد الذكاء
+    # ارسال الى Groq
     response = client.chat.completions.create(
-        model="llama3-70b-8192",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": m["role"],
@@ -85,10 +61,12 @@ if prompt:
 
     reply = response.choices[0].message.content
 
+    # حفظ الرد
     st.session_state.messages.append({
         "role": "assistant",
         "content": reply
     })
 
+    # عرض الرد
     with st.chat_message("assistant"):
         st.markdown(reply)
