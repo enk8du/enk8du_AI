@@ -1,3 +1,5 @@
+import json
+import os
 import streamlit as st
 from groq import Groq
 
@@ -28,7 +30,14 @@ if not st.session_state.authenticated:
             st.error("الباسورد خطأ")
 
     st.stop()
+MEMORY_FILE = "memory.json"
 
+# تحميل الذاكرة
+if os.path.exists(MEMORY_FILE):
+    with open(MEMORY_FILE, "r", encoding="utf-8") as f:
+        st.session_state.messages = json.load(f)
+else:
+    st.session_state.messages = []
 # -----------------------------
 # CHAT HISTORY
 # -----------------------------
@@ -52,7 +61,8 @@ if prompt:
         "role": "user",
         "content": prompt
     })
-
+with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+    json.dump(st.session_state.messages, f, ensure_ascii=False, indent=2)
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -75,7 +85,8 @@ if prompt:
         "role": "assistant",
         "content": reply
     })
-
+with open(MEMORY_FILE, "w", encoding="utf-8") as f:
+    json.dump(st.session_state.messages, f, ensure_ascii=False, indent=2)
     # عرض الرد
     with st.chat_message("assistant"):
         st.markdown(reply)
