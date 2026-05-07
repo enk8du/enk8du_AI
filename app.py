@@ -13,11 +13,20 @@ client = Groq(
 # -----------------------------
 APP_PASSWORD = st.secrets["APP_PASSWORD"]
 
-st.title("enk8du AI")
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
 
-password = st.text_input("ادخل الباسورد", type="password")
+if not st.session_state.authenticated:
 
-if password != APP_PASSWORD:
+    password = st.text_input("ادخل الباسورد", type="password")
+
+    if password:
+        if password == APP_PASSWORD:
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("الباسورد خطأ")
+
     st.stop()
 
 # -----------------------------
