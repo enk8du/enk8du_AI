@@ -1,10 +1,11 @@
+
 import json
 import os
 import streamlit as st
 
 from chat.chat_handler import chat_with_ai
 from video.video_handler import handle_video_request
-
+from image.image_handler import handle_image_request
 
 # --------------------------------
 # PASSWORD
@@ -88,15 +89,19 @@ if prompt:
     # TASK ROUTER
     # --------------------------------
 
-    if "فيديو" in prompt:
+    if "صورة" in prompt:
 
-        reply = handle_video_request(prompt)
+    reply = handle_image_request(prompt)
 
-    else:
+elif "فيديو" in prompt:
 
-        reply = chat_with_ai(
-            st.session_state.messages
-        )
+    reply = handle_video_request(prompt)
+
+else:
+
+    reply = chat_with_ai(
+        st.session_state.messages
+    )
 
     # --------------------------------
     # ASSISTANT REPLY
