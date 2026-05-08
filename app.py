@@ -89,9 +89,9 @@ if prompt:
     # TASK ROUTER
     # --------------------------------
 
-    if "صورة" in prompt:
+if "صورة" in prompt:
 
-        reply = handle_image_request(prompt)
+    reply = handle_image_request(prompt)
 
 elif "فيديو" in prompt:
 
